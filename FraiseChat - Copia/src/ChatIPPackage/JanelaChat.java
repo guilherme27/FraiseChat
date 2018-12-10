@@ -20,13 +20,9 @@ public class JanelaChat extends javax.swing.JFrame implements Observer {
 
     private void envia() {
         if (!mensagemjTextArea.getText().isEmpty()) {
-            try {
-                Mensagem mensagem = new Mensagem();
-                mensagem.setDestinatario(conexao.getIp());
-                mensagem.setRemetente(conexao.getName());
-                mensagem.setMensagem(mensagemjTextArea.getText());
+            try{
                 if (!InetAddress.getLocalHost().getHostAddress().equalsIgnoreCase(conexao.getIp())) {
-                    conexao.envia(mensagem);
+                    conexao.envia(mensagemjTextArea.getText());
                     escreve("Você disse: " + mensagemjTextArea.getText());
                     mensagemjTextArea.setText("");
                 } else {
@@ -34,7 +30,6 @@ public class JanelaChat extends javax.swing.JFrame implements Observer {
                     mensagemjTextArea.setText("");
                 }
             } catch (Exception e) {
-
             }
         }
     }

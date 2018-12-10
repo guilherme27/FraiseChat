@@ -1,7 +1,11 @@
 package ChatIPPackage;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,8 +16,6 @@ public class Conexao extends Observable {
     private int porta;
     private String name;
     private String mensagem;
-    private Socket socket;
-    private Mensagem pacote;
 
     public Conexao(String ip, int porta, String nome) {
         this.ip = ip;
@@ -38,9 +40,8 @@ public class Conexao extends Observable {
         return porta;
     }
 
-    public void envia(Mensagem texto) throws IOException {
-        socket = new Socket(ip, porta);
-        new Thread(new Envia(texto, socket)).start();
+    public void envia(String texto) {
+        new Thread(new Envia(texto)).start();
     }
 
     public void notifica(String mensagem) {
@@ -60,7 +61,6 @@ public class Conexao extends Observable {
             while (true) {
                 try {
                     socket = new DatagramSocket(getPorta());
-                    System.out.println(pacote.getMensagem());
                 } catch (SocketException ex) {
                     Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -94,19 +94,16 @@ public class Conexao extends Observable {
 
     class Envia implements Runnable {
 
-        Mensagem texto;
+        String texto;
 
-        public Envia(Mensagem msg, Socket socket) throws IOException {
-            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-            output.flush();
-            output.writeObject(msg);
-            output.flush();
+        public Envia(String texto) {
+            this.texto = texto;
         }
 
         @Override
         public void run() {
 
-            byte[] dados = texto.getMensagem().getBytes();
+            byte[] dados = texto.getBytes();
 
             try {
                 DatagramSocket clientSocket = new DatagramSocket();
