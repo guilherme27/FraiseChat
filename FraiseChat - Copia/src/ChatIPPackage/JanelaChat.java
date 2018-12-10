@@ -15,6 +15,7 @@ public class JanelaChat extends javax.swing.JFrame implements Observer {
         initComponents();
         conexao.addObserver(this);
         escreve(conexao.getName() + " entrou no chat\n");
+        conexao.envia(conexao.getName() + " entrou no chat\n");
         mensagemjTextArea.requestFocusInWindow();
     }
 
