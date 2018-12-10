@@ -51,17 +51,16 @@ public class Conexao extends Observable {
 
     class Recebe implements Runnable {
 
-        byte[] dadosReceber = new byte[255];
+        String dadosReceber;
         boolean erro = false;
-        DatagramSocket socket = null;
+        Socket socket = null;
 
         @Override
         public void run() {
             while (true) {
                 try {
-                    Socket socket2 = new Socket(InetAddress.getByName(ip), porta);
-                    socket = new DatagramSocket(getPorta());
-                    ObjectInputStream input = new ObjectInputStream(socket2.getInputStream());
+                    socket = new Socket(getIp(), getPorta());
+                    ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                     pacote = (Mensagem)input.readObject();
                     System.out.println(pacote.getMensagem());
                 } catch (SocketException ex) {
@@ -75,18 +74,11 @@ public class Conexao extends Observable {
                 }
                 erro = false;
                 while (!erro) {
-                    DatagramPacket pacoteRecebido = new DatagramPacket(dadosReceber, dadosReceber.length);
+                    Mensagem pacoteRecebido;
                     try {
-                        socket.receive(pacoteRecebido);
-                        byte[] b = pacoteRecebido.getData();
-                        String msg = "";
-                        for (int i = 0; i < b.length; i++) {
-                            if (b[i] != 0) {
-                                msg += (char) b[i];
-                            }
-                        }
-                        String nome = pacoteRecebido.getAddress().toString() + " disse:";
-                        notifica(nome + msg);
+                        dadosReceber = pacote.getMensagem();
+                        String nome = pacote.getRemetente() + " disse:";
+                        notifica(nome + dadosReceber);
                     } catch (Exception e) {
                         System.out.println("erro");
                         try {
