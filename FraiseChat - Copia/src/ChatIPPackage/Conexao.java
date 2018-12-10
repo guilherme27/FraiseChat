@@ -51,34 +51,33 @@ public class Conexao extends Observable {
 
     class Recebe implements Runnable {
 
-        String dadosReceber;
+        byte[] dadosReceber = new byte[255];
         boolean erro = false;
-        Socket socket = null;
+        DatagramSocket socket = null;
 
         @Override
         public void run() {
             while (true) {
                 try {
-                    socket = new Socket(getIp(), getPorta());
-                    ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-                    pacote = (Mensagem)input.readObject();
+                    socket = new DatagramSocket(getPorta());
                     System.out.println(pacote.getMensagem());
                 } catch (SocketException ex) {
                     Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
                 erro = false;
                 while (!erro) {
-                    Mensagem pacoteRecebido;
+                    DatagramPacket pacoteRecebido = new DatagramPacket(dadosReceber, dadosReceber.length);
                     try {
-                        dadosReceber = pacote.getMensagem();
-                        String nome = pacote.getRemetente() + " disse:";
-                        notifica(nome + dadosReceber);
+                        socket.receive(pacoteRecebido);
+                        byte[] b = pacoteRecebido.getData();
+                        String msg = "";
+                        for (int i = 0; i < b.length; i++) {
+                            if (b[i] != 0) {
+                                msg += (char) b[i];
+                            }
+                        }
+                        String nome = pacoteRecebido.getAddress().toString() + " disse:";
+                        notifica(nome + msg);
                     } catch (Exception e) {
                         System.out.println("erro");
                         try {
