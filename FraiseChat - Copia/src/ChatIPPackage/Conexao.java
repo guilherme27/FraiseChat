@@ -59,7 +59,7 @@ public class Conexao extends Observable {
         public void run() {
             while (true) {
                 try {
-                    Socket socket2 = new Socket(ip, porta);
+                    Socket socket2 = new Socket(InetAddress.getByName(ip), porta);
                     socket = new DatagramSocket(getPorta());
                     ObjectInputStream input = new ObjectInputStream(socket2.getInputStream());
                     pacote = (Mensagem)input.readObject();
